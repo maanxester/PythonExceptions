@@ -1,6 +1,6 @@
 
 from pprint import pprint
-from exceptions import SaldoInsuficienteError
+from exceptions import SaldoInsuficienteError, OperacacaoFinanceiraError
 
 
 class Cliente:
@@ -18,7 +18,8 @@ class ContaCorrente:
         self.__saldo = 100
         self.__agencia = 0
         self.__numero = 0
-
+        self.saques_nao_permitidos = 0
+        self.transferencias_nao_permitadas = 0
         self.cliente = cliente
         self.__set_agencia(agencia)
         self.__set_numero(numero)
@@ -65,13 +66,23 @@ class ContaCorrente:
     def transferir(self, valor, favorecido):
         if valor < 0:
             raise ValueError("O valor a ser sacado nao pode ser menor que zero")
-        self.sacar(valor)
+
+        try:
+            self.sacar(valor)
+        except SaldoInsuficienteError as e:
+            self.transferencias_nao_permitadas += 1
+            e.args = ()
+            raise OperacacaoFinanceiraError("Operação não finalizada") from e
+
+        # e.__context__ = SaldoInsuficienteError, podendo verificar o saldo e valor
+
         favorecido.depositar(valor)
 
     def sacar(self, valor):
         if valor < 0:
             raise ValueError("O valor a ser sacado nao pode ser menor que zero")
         if self.saldo < valor:
+            self.saques_nao_permitidos += 1
             raise SaldoInsuficienteError("", self.saldo, valor)
         self.saldo -= valor
 
@@ -100,3 +111,14 @@ def main():
 # if __name__ == "__main__":
 #     main()
 
+conta_corrente1 = ContaCorrente(None, 400, 1234567)
+conta_corrente2 = ContaCorrente(None, 401, 1234568)
+
+try:
+    conta_corrente1.transferir(1000, conta_corrente2)
+    print("Conta Corrente 1 Saldo: ", conta_corrente1.saldo)
+    print("Conta Corrente 2 Saldo: ", conta_corrente2.saldo)
+
+except OperacacaoFinanceiraError as e:
+    import traceback
+    traceback.print_exc()

@@ -1,9 +1,16 @@
 
-class SaldoInsuficienteError(Exception):
-    def __int__(self, message="", saldo=None, valor=None, *args):
+class OperacacaoFinanceiraError(Exception):
+    pass
+
+
+class SaldoInsuficienteError(OperacacaoFinanceiraError):
+    def __init__(self, message="", saldo=None, valor=None, *args):
         self.saldo = saldo
         self.valor = valor
         msg = "Saldo Insuficiente para efetuar a transacao\n" \
-            f"Saldo Atual: {saldo}, Valor a ser sacado: {valor}"
+            f"Saldo Atual: {saldo}, Valor solicitado: {valor}"
 
-        super(SaldoInsuficienteError, self).__init__(message or msg, self.saldo, *args)
+        self.msg = message or msg
+        super(SaldoInsuficienteError, self).__init__(self.msg, self.saldo, *args)
+
+
