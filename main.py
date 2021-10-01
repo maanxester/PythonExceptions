@@ -1,6 +1,7 @@
 
 from pprint import pprint
 from exceptions import SaldoInsuficienteError, OperacacaoFinanceiraError
+from leitor import LeitorDeArquivo
 
 
 class Cliente:
@@ -74,6 +75,8 @@ class ContaCorrente:
             e.args = ()
             raise OperacacaoFinanceiraError("Operação não finalizada") from e
 
+        # Sintaxe raise <Exception> from e, lançamos uma nova exceção a partir de uma já tratada.
+
         # e.__context__ = SaldoInsuficienteError, podendo verificar o saldo e valor
 
         favorecido.depositar(valor)
@@ -111,14 +114,29 @@ def main():
 # if __name__ == "__main__":
 #     main()
 
-conta_corrente1 = ContaCorrente(None, 400, 1234567)
-conta_corrente2 = ContaCorrente(None, 401, 1234568)
+# conta_corrente1 = ContaCorrente(None, 400, 1234567)
+# conta_corrente2 = ContaCorrente(None, 401, 1234568)
+#
+# try:
+#     conta_corrente1.transferir(1000, conta_corrente2)
+#     print("Conta Corrente 1 Saldo: ", conta_corrente1.saldo)
+#     print("Conta Corrente 2 Saldo: ", conta_corrente2.saldo)
+#
+# except OperacacaoFinanceiraError as e:
+#     import traceback
+#     traceback.print_exc()
 
-try:
-    conta_corrente1.transferir(1000, conta_corrente2)
-    print("Conta Corrente 1 Saldo: ", conta_corrente1.saldo)
-    print("Conta Corrente 2 Saldo: ", conta_corrente2.saldo)
+# try:
+#     leitor = LeitorDeArquivo("arquivo.txt")
+#     leitor.ler_proxima_linha()
+#
+# # except IOError:
+# #     print("Exceção do tipo IOError capturada e tratada")
+#
+# finally:  # Finally sempre será executado, mesmo ocorrendo exceções
+#     if 'leitor' in locals():  # Busca variáveis localmente por todo o script
+#         leitor.fechar()
 
-except OperacacaoFinanceiraError as e:
-    import traceback
-    traceback.print_exc()
+with LeitorDeArquivo("arquivo.txt") as leitor:
+    leitor.ler_proxima_linha()
+
