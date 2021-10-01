@@ -1,5 +1,6 @@
 
 from pprint import pprint
+from exceptions import SaldoInsuficienteError
 
 
 class Cliente:
@@ -54,20 +55,24 @@ class ContaCorrente:
     def saldo(self):
         return self.__saldo
 
-    @saldo.setter()
+    @saldo.setter
     def saldo(self, value):
         if not isinstance(value, int):
             raise ValueError("O atributo numero deve ser um numero inteiro")
 
-        if value <= 0:
-            raise ValueError("O atributo numero deve ser maior que zero")
-
         self.__saldo = value
 
     def transferir(self, valor, favorecido):
+        if valor < 0:
+            raise ValueError("O valor a ser sacado nao pode ser menor que zero")
+        self.sacar(valor)
         favorecido.depositar(valor)
 
     def sacar(self, valor):
+        if valor < 0:
+            raise ValueError("O valor a ser sacado nao pode ser menor que zero")
+        if self.saldo < valor:
+            raise SaldoInsuficienteError("", self.saldo, valor)
         self.saldo -= valor
 
     def depositar(self, valor):
@@ -92,5 +97,6 @@ def main():
             sys.exit()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+
